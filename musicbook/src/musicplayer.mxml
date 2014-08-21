@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   width="330" height="385" backgroundAlpha="0.0" creationComplete="player.send()">
+	<fx:Style source="musicplayer.css"/>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:HTTPService id="player" url="http://localhost/musicbook/musicplayer.php" result="showInfo(event)" fault="noInfo(event)" />
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import flash.media.Sound;
+			import flash.media.SoundChannel;
+			import flash.net.URLLoader;
+			import flash.net.URLRequest;
+			import flash.events.MouseEvent;
+			import flash.events.Event;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent; 
+			
+			[Bindable]
+			public var myinfo:ArrayCollection = new ArrayCollection();
+			
+			public var s:Sound = new Sound();
+			public var schannel:SoundChannel = new SoundChannel();
+			public var plays:Boolean;
+			private var currentspot:Number;
+			
+			public function showInfo(e:ResultEvent):void{
+				myinfo = e.result.musicplayer.song;
+				playbtn.addEventListener(MouseEvent.CLICK, playMusic);
+				pausebtn.addEventListener(MouseEvent.CLICK, pauseMusic);
+				stopbtn.addEventListener(MouseEvent.CLICK, stopMusic);
+			}
+			
+			public function noInfo(e:FaultEvent):void{
+				Alert.show("Cannot connect to your server", "Data Loading Error");
+			}
+			
+			private function playMusic(e:MouseEvent):void { 
+				schannel = s.play();
+				plays=true;
+			}
+			
+			private function pauseMusic(e:MouseEvent):void{
+				if(plays == true){
+					currentspot = schannel.position;
+					plays = false;
+					schannel.stop();
+				}else{
+					schannel = s.play(currentspot);
+					plays = true;
+				}	
+			}
+			
+			private function stopMusic(e:MouseEvent):void { 
+				SoundMixer.stopAll();
+				plays=false;
+			}
+			
+			public function getFromDb(thisone:int):void{
+				songtitle.text = myinfo[thisone].title;
+				Alert.show(thisone.toString());
+				s = new Sound(new URLRequest("http://localhost/musicbook/musicplayer/songs/"+myinfo[thisone].mp3));
+				if(plays=true)
+				{
+					SoundMixer.stopAll();
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<s:DataGrid id="songlist" dataProvider="{myinfo}" x="0" y="98" width="330" height="287" click="getFromDb(songlist.selectedIndex)" />
+	<s:Button id="playbtn" x="145" y="13" width="45" height="50" label="Play" icon="playerimgs/button_play.png" />
+	<s:Button id="pausebtn" x="255" y="24" width="35" height="35" label="Pause" color="#FFFFFF" cornerRadius="0"
+			  icon="playerimgs/pause.png" />
+	<s:Button id="stopbtn" x="39" y="24" width="35" height="35" label="Stop" icon="playerimgs/stop.png" />
+	<s:TextArea id="songtitle" x="0" y="71" width="330" height="29" text="song will appear here:"/>
+</s:Application>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<musicplayer>
+	<song>
+	<title>you da one</title>
+	<mp3>you da one.mp3</mp3>
+	<length>3:30</length>
+	</song>	
+	<song>
+	<title>you da one</title>
+	<mp3>you da one.mp3</mp3>
+	<length>3:30</length>
+	</song>	
+	<song>
+	<title>you da one</title>
+	<mp3>you da one.mp3</mp3>
+	<length>3:30</length>
+	</song>	
+</musicplayer>
